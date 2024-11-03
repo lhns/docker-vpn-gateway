@@ -12,4 +12,6 @@ RUN apt-get update \
 COPY elevate /
 COPY docker-vpn-gateway.sh /
 
+ENV INTERVAL=30
+
 CMD ["/docker-vpn-gateway.sh"]
