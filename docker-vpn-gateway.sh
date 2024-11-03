@@ -132,5 +132,6 @@ trap cleanup SIGINT SIGTERM
 
 while true; do
   configure_routing "$CLIENT_NETWORK" "$TUN_CONTAINER_NAME"
-  sleep 60
+  sleep 60 &
+  wait
 done
