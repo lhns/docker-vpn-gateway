@@ -1,7 +1,7 @@
 FROM debian:12.7
 
 RUN apt-get update \
- && apt-get install -y ca-certificates curl gnupg iproute2 iptables jq procps \
+ && apt-get install -y bind-tools ca-certificates curl gnupg iproute2 iptables jq procps \
  && install -m 0755 -d /etc/apt/keyrings \
  && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
  && chmod a+r /etc/apt/keyrings/docker.gpg \
@@ -12,4 +12,4 @@ RUN apt-get update \
 COPY elevate /
 COPY docker-vpn-gateway.sh /
 
-CMD ["/docker-vpn-gateway.sh"]
+CMD ["exec", "/docker-vpn-gateway.sh"]
