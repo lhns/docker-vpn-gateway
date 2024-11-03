@@ -14,13 +14,14 @@ ns_rule() {
 
 configure_tun_routing() {
   local tun_container_name="$1"
+  local client_network="$2"
 
   if ! tun_container_meta="$(docker container inspect "$tun_container_name" 2>/dev/null | jq -e '.[0]')"; then
     return 50
   fi
 
   echo "INFO: [$tun_container_name] tun container found" >&2
-  tun_container_ip="$(echo "$tun_container_meta" | jq -r '.NetworkSettings.Networks["arr_arr"].IPAddress')"
+  tun_container_ip="$(echo "$tun_container_meta" | jq -r --arg net "$client_network" '.NetworkSettings.Networks[$net].IPAddress')"
   echo "DEBUG: [$tun_container_name] tun container ip: $tun_container_ip" >&2
   tun_pid="$(echo "$tun_container_meta" | jq -r '.State.Pid')"
 
@@ -91,7 +92,7 @@ configure_routing() {
   #  return 1
   #fi
 
-  configure_tun_routing "$tun_container_name"
+  configure_tun_routing "$tun_container_name" "$client_network"
   case $? in
     0) :;;
     50)
@@ -122,7 +123,10 @@ configure_routing() {
   echo "INFO: finished" >&2
 }
 
+configure_routing_and_sleep() {
+  configure_routing "$@" && sleep 60
+}
+
 while true; do
-  configure_routing "$CLIENT_NETWORK" "$TUN_CONTAINER_NAME"
-  sleep 60
+  configure_routing_and_sleep "$CLIENT_NETWORK" "$TUN_CONTAINER_NAME" || break
 done
