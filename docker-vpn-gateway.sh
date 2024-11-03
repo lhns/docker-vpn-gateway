@@ -58,7 +58,11 @@ configure_client_routing() {
   echo "INFO: [$client_container_name] client container found" >&2
   client_pid="$(echo "$client_container_meta" | jq -r '.State.Pid')"
 
-  if ! tun_container_ip="$(nsenter -n -t "$client_pid" dig +short "$tun_container_name")"; then
+  if ! dns="$(docker container exec "$client_container_name" cat /etc/resolv.conf | grep -m 1 'nameserver 127' | awk '{print $2}')" || [ -z "$dns" ]; then
+    echo "ERROR: [$client_container_name] failed to read client container dns server" >&2
+    return 1
+  fi
+  if ! tun_container_ip="$(nsenter -n -t "$client_pid" dig +short "$tun_container_name" "@$dns")" || [ -z "$tun_container_ip" ]; then
     echo "ERROR: [$client_container_name] failed to resolve tun container ip" >&2
     return 1
   fi
