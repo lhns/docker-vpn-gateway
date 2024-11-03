@@ -123,7 +123,12 @@ configure_routing() {
   echo "INFO: finished" >&2
 }
 
-trap "exit 0" SIGINT SIGTERM
+cleanup() {
+  echo exiting
+  exit 0
+}
+
+trap cleanup SIGINT SIGTERM
 
 while true; do
   configure_routing "$CLIENT_NETWORK" "$TUN_CONTAINER_NAME"
