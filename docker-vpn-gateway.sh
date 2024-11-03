@@ -123,10 +123,9 @@ configure_routing() {
   echo "INFO: finished" >&2
 }
 
-configure_routing_and_sleep() {
-  configure_routing "$@" && sleep 60
-}
+trap "exit 0" SIGINT SIGTERM
 
 while true; do
-  configure_routing_and_sleep "$CLIENT_NETWORK" "$TUN_CONTAINER_NAME" || break
+  configure_routing "$CLIENT_NETWORK" "$TUN_CONTAINER_NAME"
+  sleep 60
 done
