@@ -21,7 +21,7 @@ configure_tun_routing() {
 
   echo "INFO: [$tun_container_name] tun container found" >&2
   tun_container_ip="$(echo "$tun_container_meta" | jq -r '.NetworkSettings.Networks["arr_arr"].IPAddress')"
-  echo "INFO: [$tun_container_name] tun container ip is $tun_container_ip" >&2
+  echo "DEBUG: [$tun_container_name] tun container ip: $tun_container_ip" >&2
   tun_pid="$(echo "$tun_container_meta" | jq -r '.State.Pid')"
 
   if ! tun_addrs="$(nsenter -n -t "$tun_pid" ip --json address)"; then
@@ -103,7 +103,7 @@ configure_routing() {
       ;;
   esac
 
-  client_containers="$(echo "$client_network_meta" | jq -r --arg tun "$tun_container_name" '(.Containers // [])|to_entries|map(select((.key|startswith("lb-")|not) and (.value.Name != $tun))|.value.Name)[]')"
+  net_containers="$(echo "$client_network_meta" | jq '(.Containers // [])|to_entries|map(select(.key|startswith("lb-")|not)|.value.Name)')"
 
   while IFS= read -r client_container_name; do
     configure_client_routing "$client_container_name" "$tun_container_name"
@@ -117,7 +117,7 @@ configure_routing() {
         return 1
         ;;
     esac
-  done < <(echo "$client_containers")
+  done < <(echo "$net_containers" | jq -r --arg tun "$tun_container_name" 'map(select(. != $tun))[]')
 
   echo "INFO: finished" >&2
 }
