@@ -62,11 +62,12 @@ configure_client_routing() {
     echo "ERROR: [$client_container_name] failed to read client container dns server" >&2
     return 1
   fi
+  echo "DEBUG: [$client_container_name] dns server: '$dns'" >&2
   if ! tun_container_ip="$(nsenter -n -t "$client_pid" dig +short "$tun_container_name" "@$dns")" || [ -z "$tun_container_ip" ]; then
     echo "ERROR: [$client_container_name] failed to resolve tun container ip" >&2
     return 1
   fi
-  echo "INFO: [$client_container_name] tun container ip is $tun_container_ip" >&2
+  echo "DEBUG: [$client_container_name] tun container ip: $tun_container_ip" >&2
   if ! client_gateway="$(nsenter -n -t "$client_pid" ip --json route | jq -re --arg ip "$tun_container_ip" 'map(select(.dst == "default" and .gateway == $ip).gateway)[0]')"; then
     nsenter -n -t "$client_pid" ip route del default 2>/dev/null &&
       echo "INFO: [$client_container_name] delete default route" >&2
