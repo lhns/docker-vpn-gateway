@@ -12,4 +12,4 @@ RUN apt-get update \
 COPY elevate /
 COPY docker-vpn-gateway.sh /
 
-CMD ["exec", "/docker-vpn-gateway.sh"]
+CMD ["/docker-vpn-gateway.sh"]
