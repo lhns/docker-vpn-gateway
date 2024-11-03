@@ -124,7 +124,7 @@ configure_routing() {
 }
 
 cleanup() {
-  echo exiting
+  echo exiting >&2
   exit 0
 }
 
