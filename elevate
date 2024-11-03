@@ -12,4 +12,4 @@ name="$(docker container inspect "$cid" --format "{{.Name}}")"
 
 echo "elevating $cid ($name) with image $image" >&2
 
-exec docker run -i --sig-proxy --rm --privileged --name "${name}.elevated" -e CLIENT_NETWORK -e TUN_CONTAINER_PREFIX -v /var/run/docker.sock:/var/run/docker.sock "$image"
+exec docker run -i --sig-proxy --rm --privileged --name "${name}.elevated" -e CLIENT_NETWORK -e TUN_CONTAINER_PREFIX -v /var/run/docker.sock:/var/run/docker.sock -v /proc:/proc "$image"
