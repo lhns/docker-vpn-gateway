@@ -4,6 +4,8 @@
 [![Release Notes](https://img.shields.io/github/release/lhns/docker-vpn-gateway.svg?maxAge=3600)](https://github.com/lhns/docker-vpn-gateway/releases/latest)
 [![Apache License 2.0](https://img.shields.io/github/license/lhns/docker-vpn-gateway.svg?maxAge=3600)](https://www.apache.org/licenses/LICENSE-2.0)
 
+This docker swarm operator changes the default gateway of all containers connected to a specific network to go out the tun interface of a vpn container.
+
 ## Example
 
 ```yml
