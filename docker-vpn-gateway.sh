@@ -63,7 +63,7 @@ configure_client_routing() {
     echo "ERROR: [$client_container_name] failed to read client container dns server" >&2
     return 1
   fi
-  echo "DEBUG: [$client_container_name] dns server: '$dns'" >&2
+  echo "DEBUG: [$client_container_name] dns server: $dns" >&2
   if ! tun_container_ip="$(nsenter -n -t "$client_pid" dig +short "$tun_container_name" "@$dns")" || [ -z "$tun_container_ip" ]; then
     echo "ERROR: [$client_container_name] failed to resolve tun container ip" >&2
     return 1
