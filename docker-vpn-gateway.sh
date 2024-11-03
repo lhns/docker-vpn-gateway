@@ -98,7 +98,7 @@ configure_routing() {
       ;;
   esac
 
-  client_containers="$(echo "$client_network_meta" | jq -r --arg tun "$tun_container_name" '(.Containers // [])|to_entries|map(select(.key|startswith("lb-")|not and .value.Name != $tun)|.value.Name)')"
+  client_containers="$(echo "$client_network_meta" | jq -r --arg tun "$tun_container_name" '(.Containers // [])|to_entries|map(select((.key|startswith("lb-")|not) and (.value.Name != $tun))|.value.Name)')"
 
   while IFS= read -r client_container_name; do
     configure_client_routing "$client_container_name" "$tun_container_name"
