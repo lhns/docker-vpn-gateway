@@ -31,7 +31,7 @@ configure_tun_routing() {
     echo "ERROR: [$tun_container_name] failed to find tun interface name" >&2
     return 1
   fi
-  if ! tun_client_net_name="$(echo "$tun_addrs" | jq -re --arg ip "$tun_container_ip" 'map(select(.addr_info[0].local==$ip))[0].ifnam
+  if ! tun_client_net_name="$(echo "$tun_addrs" | jq -re --arg ip "$tun_container_ip" 'map(select(.addr_info[0].local==$ip))[0].ifname')"; then
     echo "ERROR: [$tun_container_name] failed to find client network interface name with ip $tun_container_ip" >&2
     return 1
   fi
@@ -58,7 +58,7 @@ configure_client_routing() {
   echo "INFO: [$client_container_name] client container found" >&2
   client_pid="$(echo "$client_container_meta" | jq -r '.State.Pid')"
 
-  if ! client_gateway="$(nsenter -n -t "$client_pid" ip --json route | jq -re --arg ip "$tun_container_ip" 'map(select(.dst == "defau
+  if ! client_gateway="$(nsenter -n -t "$client_pid" ip --json route | jq -re --arg ip "$tun_container_ip" 'map(select(.dst == "default" and .gateway == $ip).gateway)[0]')"; then
     nsenter -n -t "$client_pid" ip route del default 2>/dev/null &&
       echo "INFO: [$client_container_name] delete default route" >&2
     nsenter -n -t "$client_pid" ip route add default via "$tun_container_ip" &&
