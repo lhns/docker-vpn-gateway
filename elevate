@@ -3,7 +3,7 @@
 set -eo pipefail
 
 get_current_container_id() {
-  cat /proc/self/mountinfo | grep "/docker/containers/" | head -1 | sed -E 's/.*?\/docker\/containers\/([^/]*?).*/\1/'
+  cat /proc/self/mountinfo | grep "/docker/containers/" | sed -E 's/.*?\/docker\/containers\/([^/]*?).*/\1/' | head -1
 }
 
 cid="$(get_current_container_id)"
