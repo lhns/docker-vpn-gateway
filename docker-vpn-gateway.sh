@@ -84,7 +84,7 @@ configure_routing() {
   client_network_meta="$(docker network inspect "$client_network" | jq '.[0]')"
 
   if echo "$client_network_meta" | jq -e '.Internal|not' >/dev/null; then
-    echo "WARN: client network is not set to internal and could leak traffic to the internet"
+    echo "WARN: client network is not set to internal and could leak traffic to the internet" >&2
   fi
 
   #if echo "$client_network_meta" | jq -e '.Options.icc != "true"' >/dev/null; then
