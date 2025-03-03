@@ -73,7 +73,9 @@ configure_client_routing() {
     nsenter -n -t "$client_pid" ip route del default 2>/dev/null &&
       echo "INFO: [$client_container_name] delete default route" >&2
     nsenter -n -t "$client_pid" ip route add default via "$tun_container_ip" &&
-      echo "INFO: [$client_container_name] add default route via tun container" >&2
+      echo "INFO: [$client_container_name] add default route via tun container ip $tun_container_ip" >&2
+    echo "nameserver $tun_container_ip" >> /etc/resolv.conf &&
+      echo "INFO: [$client_container_name] add tun container ip $tun_container_ip as nameserver" >&2
   fi
 }
 
