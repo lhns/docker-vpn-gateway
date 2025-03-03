@@ -16,7 +16,7 @@ configure_tun_routing() {
   local tun_container_name="$1"
   local client_network="$2"
 
-  if ! tun_container_meta="$(docker container inspect "$tun_container_name" 2>/dev/null | jq -e '.[0]')"; then
+  if ! tun_container_meta="$(docker container inspect "$tun_container_name" 2>/dev/null | jq -e 'map(select(.State.Running))[0]')"; then
     return 50
   fi
 
@@ -52,7 +52,7 @@ configure_client_routing() {
   local client_container_name="$1"
   local tun_container_name="$2"
 
-  if ! client_container_meta="$(docker container inspect "$client_container_name" 2>/dev/null | jq -e '.[0]')"; then
+  if ! client_container_meta="$(docker container inspect "$client_container_name" 2>/dev/null | jq -e 'map(select(.State.Running))[0]')"; then
     return 50
   fi
 
