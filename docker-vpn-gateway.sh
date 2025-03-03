@@ -59,7 +59,8 @@ configure_client_routing() {
   echo "INFO: [$client_container_name] client container found" >&2
   client_pid="$(echo "$client_container_meta" | jq -r '.State.Pid')"
 
-  if ! dns="$(docker container exec "$client_container_name" cat /etc/resolv.conf | grep -m 1 'nameserver 127' | awk '{print $2}')" || [ -z "$dns" ]; then
+  client_resolv_conf="$(docker container exec "$client_container_name" cat /etc/resolv.conf)"
+  if ! dns="$(echo "$client_resolv_conf" | grep -m 1 'nameserver 127' | awk '{print $2}')" || [ -z "$dns" ]; then
     echo "ERROR: [$client_container_name] failed to read client container dns server" >&2
     return 1
   fi
@@ -74,7 +75,14 @@ configure_client_routing() {
       echo "INFO: [$client_container_name] delete default route" >&2
     nsenter -n -t "$client_pid" ip route add default via "$tun_container_ip" &&
       echo "INFO: [$client_container_name] add default route via tun container ip $tun_container_ip" >&2
-    echo "nameserver $tun_container_ip" | docker container exec -i "$client_container_name" tee -a /etc/resolv.conf >/dev/null &&
+
+    comment="# tun container ip"
+    client_new_resolv_conf="$(
+      echo "$client_resolv_conf" | sed "/$comment/,/nameserver .*/d"
+      echo "$comment"
+      echo "nameserver $tun_container_ip"
+    )"
+    echo "$client_new_resolv_conf" | docker container exec -i "$client_container_name" tee /etc/resolv.conf >/dev/null &&
       echo "INFO: [$client_container_name] add tun container ip $tun_container_ip as nameserver" >&2
   fi
 }
