@@ -13,7 +13,7 @@ version: "3.8"
 
 services:
   add-vpn-gateway:
-    image: ghcr.io/lhns/vpn-gateway:0.2.0
+    image: ghcr.io/lhns/vpn-gateway:0.2.1
     command: /elevate
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
